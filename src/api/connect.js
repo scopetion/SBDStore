@@ -19,12 +19,15 @@ const connect = async (state, dispatch) => {
         console.log(apiState);
         return
     }
+    dispatch({type:"CONNECT_INIT"})
 
     try {
         await getWeb3().then(async (result) => {
 
             dispatch({ type: "CONNECT", payload: result.web3 })
             let chainID = await window.ethereum.request({ methods: "eth_chainId" })
+            dispatch({type:"SET_NETWORK",payload:chainID})
+
             window.ethereum.request({ methods: 'eth_requestAccounts' }).then(async accounts => {
                 if (accounts && accounts.length > 0) {
                     dispatch({ type: "CONNECT_SUCCESS" })
@@ -32,9 +35,9 @@ const connect = async (state, dispatch) => {
                 }
             })
 
-            window.ethereum.on('accountsChanged', async (accounts) => {
+            window.ethereum.on('accountsChanged', (accounts) => {
                 dispatch({ type: "SET_ACCOUNT", payload: accounts[0] })
-                result.web3().eth.getAccounts(accounts).then(async res => {
+                result.web3().eth.getAccounts().then(async res => {
                     let balance = await result.web3().eth.getBalance(res[0])
                     dispatch({type:"SET_BALANCE",payload:balance / 10**18})
                 })
@@ -51,10 +54,11 @@ const connect = async (state, dispatch) => {
         
         })
     }
-    catch {
-        dispatch({type:"CONNECT_ERROR"})
-
+    catch(e) {
+        console.log(e);
     }
+
+
 }
 
 const CreContext = React.createContext()

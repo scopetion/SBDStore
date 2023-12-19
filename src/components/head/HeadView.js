@@ -1,17 +1,30 @@
-import { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import logo from '../../imgs/logo.png'
-
+import judgeStatus from '../../api/judgeStatus'
 import ConnectWallet from '../wallet/ConnectWallet.js'
+import { useLocation } from "react-router-dom";
+import {useCreContext} from '../../api/connect'                                                                       
 import HeadViewStyle from './HeadViewStyle'
 
-const HeadView =()=>{
+const HeadView = (props) => {
+    const { closeDialog, updateData } = props
+    let { state, dispatch } = useCreContext();
+    let location = useLocation()
 
-    return(
-        <HeadViewStyle> 
+    useEffect(async () => {
+        let judgeRes = await judgeStatus(state)
+        if (!judgeRes) {
+            return
+        }
+        
+
+    }, [state.account, state.network]);
+    return (
+        <HeadViewStyle>
             <div className="container-header">
                 <div className="left">
-                    <img src={logo} style={{width:"120px"}}/> 
+                    <img src={logo} style={{ width: "120px" }} />
 
                 </div>
                 <div className="font-box">
