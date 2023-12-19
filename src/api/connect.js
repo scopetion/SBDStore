@@ -9,52 +9,56 @@ const openNotification = (message) => {
         message: message,
         description: 'Please Connect',
         onClick: () => {
-            console.log('');
+            console.log('Clicked Connect');
         },
     });
 };
+
 const connect = async (state, dispatch) => {
     const { apiState } = state
     if (apiState) {
         console.log(apiState);
         return
     }
-    dispatch({type:"CONNECT_INIT"})
+    dispatch({ type: "CONNECT_INIT" })
 
     try {
+
         await getWeb3().then(async (result) => {
 
             dispatch({ type: "CONNECT", payload: result.web3 })
-            let chainID = await window.ethereum.request({ methods: "eth_chainId" })
-            dispatch({type:"SET_NETWORK",payload:chainID})
+            let chainID = await window.ethereum.request({ method: "eth_chainId" })
+            dispatch({ type: "SET_NETWORK", payload: chainID })
+            console.log(chainID);
 
-            window.ethereum.request({ methods: 'eth_requestAccounts' }).then(async accounts => {
+            window.ethereum.request({ method: 'eth_requestAccounts' }).then(async (accounts) => {
                 if (accounts && accounts.length > 0) {
+                   
+                    dispatch({ type: "SET_ACCOUNT", payload: accounts[0] }) 
                     dispatch({ type: "CONNECT_SUCCESS" })
-                    dispatch({ type: "SET_ACCOUNT", payload: accounts[0] })
                 }
             })
 
             window.ethereum.on('accountsChanged', (accounts) => {
                 dispatch({ type: "SET_ACCOUNT", payload: accounts[0] })
-                result.web3().eth.getAccounts().then(async res => {
-                    let balance = await result.web3().eth.getBalance(res[0])
-                    dispatch({type:"SET_BALANCE",payload:balance / 10**18})
+                result.web3.eth.getAccounts().then(async res => {
+                    let balance = await result.web3.eth.getBalance(res[0])
+                    dispatch({ type: "SET_BALANCE", payload: balance / 10 ** 18 })
                 })
             })
 
-            window.ethereum.on('chainChanged',(network)=>{
+            window.ethereum.on('chainChanged', (network) => {
                 dispatch({ type: "SET_NETWORK", payload: network })
-                result.web3().eth.getAccounts().then(async res=>{
-                    let balance = await result.web3().eth.getBalance(res[0])
-                    dispatch({type:"SET_BALANCE",payload:balance / 10**18})
+                result.web3.eth.getAccounts().then(async res => {
+                    let balance = await result.web3.eth.getBalance(res[0])
+                    dispatch({ type: "SET_BALANCE", payload: balance / 10 ** 18 })
                 })
             })
 
-        
+
         })
     }
-    catch(e) {
+    catch (e) {
         console.log(e);
     }
 
@@ -63,15 +67,15 @@ const connect = async (state, dispatch) => {
 
 const CreContext = React.createContext()
 
-const ConnectProvider = (props)=>{
-    const [state,dispatch] = useReducer(reducer,initState)
+const ConnectProvider = (props) => {
+    const [state, dispatch] = useReducer(reducer, initState)
 
-    return <CreContext.Provider value={{state,dispatch}}>
-            {props.children}
-        </CreContext.Provider>
-    
+    return <CreContext.Provider value={{ state, dispatch }}>
+        {props.children}
+    </CreContext.Provider>
+
 }
 
-const useCreContext = ()=>({...useContext(CreContext)})
+const useCreContext = () => ({ ...useContext(CreContext) })
 
-export { connect,ConnectProvider,useCreContext }
+export { connect, ConnectProvider, useCreContext }

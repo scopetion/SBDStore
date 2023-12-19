@@ -12,11 +12,11 @@ const HeadView = (props) => {
     let { state, dispatch } = useCreContext();
     let location = useLocation()
 
-    useEffect(async () => {
-        let judgeRes = await judgeStatus(state)
-        if (!judgeRes) {
-            return
-        }
+    useEffect( () => {
+        // let judgeRes = await judgeStatus(state)
+        // if (!judgeRes) {
+        //     return
+        // }
         
 
     }, [state.account, state.network]);
