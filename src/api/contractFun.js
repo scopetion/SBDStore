@@ -1,24 +1,31 @@
-import { useState, useEffect } from 'react'
-import getWeb3 from './getWeb3'
-import addressAll from './addressAll'
-const CONTRACT = addressAll
+import React, { useEffect, useState } from 'react'
 
-function getContractName(name,address, web3) {
+async function dealMethods(contract, methodName, account, params) {
 
-    return new web3.eth.Contract(CONTRACT[name].abi, CONTRACT[name].address,{})
+    try {
+        await contract[methodName].myMethod(...params).estimateGas({
+            from: account,
+        }).then(async (gas) => {
+            await contract[methodName].myMethod(...params).send({
+                from: account,
+                // gas:
+            }).then((res) => {
+                return res
+            })
+        })
+    }
+    catch (e) {
+        console.log(e);
+    }
 }
 
-function getConContract( name, address, web3) {
-    return new web3.eth.Contract(CONTRACT[name].abi,CONTRACT[name].address,{})
+async function viewMethods(contract, methodName, account, params) {
+    let res = await contract[methodName].myMethod(...params).call({
+        from: account
+    })
+    return res
+
 }
 
-function getConAddress(name,address, web3) {
-    return new web3.eth.Contract(CONTRACT[name].address,address,{})
-}
 
-export {
-    CONTRACT,
-    getContractName,
-    getConAddress,
-    getConContract
-}
+export { dealMethods, viewMethods }

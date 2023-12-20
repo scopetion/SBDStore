@@ -4,12 +4,22 @@ import usdt from '../../imgs/usdt.png'
 import sbd from '../../imgs/SBD.png'
 import svt from '../../imgs/svt.png'
 import { CloseCircleOutlined } from '@ant-design/icons';
+import {useCreContext} from '../../api/connect'
+import { dealMethods,viewMethods } from "../../api/contractFun";
 import FundingStyle from './style.js'
 
-const Funding = () => {
-
+const Funding = (props) => {
+    let {state, dispatch} = useCreContext();
     const [curnav, setCurnav] = useState(1)
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [price,setPrice] = useState()
+
+    const handelDealMethods = async ()=>{
+        await dealMethods()
+    }
+    const handelViewMethods = async ()=>{
+        await viewMethods()
+    }
 
     const onChange = (checked) => {
         console.log(`switch to ${checked}`);
@@ -20,6 +30,8 @@ const Funding = () => {
 
     const showModal = () => {
         setIsModalOpen(true);
+        
+        console.log(state);
     };
     const handleOk = () => {
         setIsModalOpen(false);
@@ -30,6 +42,10 @@ const Funding = () => {
     const onShowSizeChange = (current, pageSize) => {
         console.log(current, pageSize);
     };
+
+    useEffect(()=>{
+        handelDealMethods()
+    },[])
     return (
         <FundingStyle>
             <Modal title="Sign Up" open={isModalOpen} footer={null} onCancel={handleCancel} maskClosable={true}
@@ -39,7 +55,7 @@ const Funding = () => {
                         label="Wallet Address "
                         name="address"
                     >
-
+                        {state.account}
                     </Form.Item>
                     <Form.Item
                         label="Invitation Code "
@@ -73,18 +89,12 @@ const Funding = () => {
                         </div>
 
                         <div className="box-first">
-                            <div className="seconed-contain">
-                                <span className="contain-title">SBD Amount</span>
-                                <span>100,000,000</span>
-                            </div>
+                            
                             <div className="seconed-contain">
                                 <span className="contain-title">Price</span>
-                                <span>100,000,000</span>
+                                <span> {price} </span>
                             </div>
-                            <div className="seconed-contain">
-                                <span className="contain-title">SBD Value</span>
-                                <span>100,000,000</span>
-                            </div>
+                          
                             <hr />
                             <div className="seconed-box1">
                                 <div className="box1-con">

@@ -1,4 +1,5 @@
 import erc20 from '../abi/erc20.json'
+import spbd from '../abi/spbd.json'
 import SBD from '../abi/sbd.json'
 import SBDLock from '../abi/sbdlock.json'
 import SRT from '../abi/SRT.json'
@@ -11,6 +12,7 @@ let Contract
 if(true){
     Contract={
         erc20:{address:'',abi:erc20},
+        spbd:{address:'0x65d741A9d21cA93AB8aC202b7e6693AE3656CEFa',abi:spbd},
         SBD:{address:'0x3FED298a1Dd942b9E0F05A5d58f1AFA741847781',abi:SBD},
         SBDLock:{address:'0xb7c359518b3565489a20cd061b42ee57cfb5b0df',abi:SBDLock},
         NFTLock:{address:'0x0FAC788f05A30745b238968eF8c9626e5Dda31bB',abi:NFTLock},

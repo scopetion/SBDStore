@@ -49,9 +49,11 @@ const connect = async (state, dispatch) => {
 
             window.ethereum.on('chainChanged', (network) => {
                 dispatch({ type: "SET_NETWORK", payload: network })
+                console.log(network);
                 result.web3.eth.getAccounts().then(async res => {
                     let balance = await result.web3.eth.getBalance(res[0])
                     dispatch({ type: "SET_BALANCE", payload: balance / 10 ** 18 })
+                    
                 })
             })
 
