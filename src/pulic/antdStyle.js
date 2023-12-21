@@ -60,6 +60,14 @@ border: 0.5px solid rgba(255,255,255,0.1);
 color: white;
 height: 40px;
 }
+.ant-select{
+    border-radius:10px;
+}
+.ant-select:not(.ant-select-customize-input) .ant-select-selector{
+    background-color: rgb(28,28,28);
+    border:1px solid rgba(255,255,2555,0.1);
+    border-radius:10px;
+}
 @media screen and (max-width: 1920px){
     .ant-btn{
         font-size: 18px;

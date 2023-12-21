@@ -8,9 +8,9 @@ import Swap from '../abi/swap.json'
 import NFTLock from '../abi/nftlock.json'
 import OgLock from '../abi/oglock.json'
 
-let Contract 
+let CONTRACTS 
 if(true){
-    Contract={
+    CONTRACTS={
         erc20:{address:'',abi:erc20},
         spbd:{address:'0x65d741A9d21cA93AB8aC202b7e6693AE3656CEFa',abi:spbd},
         SBD:{address:'0x3FED298a1Dd942b9E0F05A5d58f1AFA741847781',abi:SBD},
@@ -20,8 +20,8 @@ if(true){
         SVT:{address:'0x93d04c7311282114F79380F4624EBe3267bBd36A',abi:SVT},
         Swap:{address:'0x93d809098DD687162b81C9f13198e75af73D2E0f',abi:Swap},                                                                           
         OgLock:{address:'',abi:OgLock}
-
+        
     }
 }
 
-export default Contract
+export default CONTRACTS

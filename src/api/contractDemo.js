@@ -1,23 +1,30 @@
 import { useState, useEffect } from 'react'
 import getWeb3 from './getWeb3'
 import addressAll from './addressAll'
-const CONTRACT = addressAll
+import { notification } from 'antd';
+const CONTRACTS = addressAll
 //创建合约实例
-function getContractName(name,address, web3) {
-
-    return new web3.eth.Contract(CONTRACT[name].abi, CONTRACT[name].address,{})
+function getContractName(name, web3) {
+    if(!web3){
+        notification.error({
+            message: "Please connect",
+            description:
+                "",
+        });
+    }
+   return new web3.eth.Contract(CONTRACTS[name].abi, CONTRACTS[name].address, {});
 }
 
 function getConContract( name, address, web3) {
-    return new web3.eth.Contract(CONTRACT[name].abi,CONTRACT[name].address,{})
+    return new web3.eth.Contract(CONTRACTS[name].abi,address,{})
 }
 
-function getConAddress(name,address, web3) {
-    return new web3.eth.Contract(CONTRACT[name].address,address,{})
+function getConAddress(name) {
+    return CONTRACTS[name].address
 }
 
 export {
-    CONTRACT,
+    CONTRACTS,
     getContractName,
     getConAddress,
     getConContract

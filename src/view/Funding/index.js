@@ -6,6 +6,10 @@ import svt from '../../imgs/svt.png'
 import { CloseCircleOutlined } from '@ant-design/icons';
 import {useCreContext} from '../../api/connect'
 import { dealMethods,viewMethods } from "../../api/contractFun";
+import { getConContract,getContractName } from "../../api/contractDemo";
+import judgeStatus from "../../api/judgeStatus";
+import BigNumber from "bignumber.js"
+
 import FundingStyle from './style.js'
 
 const Funding = (props) => {
@@ -13,12 +17,43 @@ const Funding = (props) => {
     const [curnav, setCurnav] = useState(1)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [price,setPrice] = useState()
+    const [balance,setBalance] = useState()
 
-    const handelDealMethods = async ()=>{
-        await dealMethods()
+    const payOptions=[
+        {
+          value: '200',
+          label: '200',
+        },
+        {
+          value: '500',
+          label: '500',
+        },
+        {
+          value: '1000',
+          label: '1000',
+        },
+        {
+          value: '2000',
+          label: '2000',
+        },
+        {
+            value: '5000',
+            label: '5000',
+          },
+          {
+            value: '10000',
+            label: '10000',
+          }
+      ]
+
+
+    const handelDealMethods = async (name, params)=>{
+        let contractAdd = await getContractName('spbd',state.api)
+        await dealMethods(contractAdd,name,state.account,params)
     }
-    const handelViewMethods = async ()=>{
-        await viewMethods()
+    const handelViewMethods = async (name,params)=>{
+        let contractAdd = await getContractName("spbd",state.api)
+        await viewMethods(contractAdd,name,state.account,params)
     }
 
     const onChange = (checked) => {
@@ -31,7 +66,6 @@ const Funding = (props) => {
     const showModal = () => {
         setIsModalOpen(true);
         
-        console.log(state);
     };
     const handleOk = () => {
         setIsModalOpen(false);
@@ -43,9 +77,24 @@ const Funding = (props) => {
         console.log(current, pageSize);
     };
 
+    const getPrice =async () =>{
+        let salePrice = await handelViewMethods("salePrice",[])
+        setPrice(salePrice)
+    }
+
+    const getBalance =async ()=>{
+        let balanceOf = await handelViewMethods('getBalanceOfSbd',[])
+        setBalance(balanceOf)
+    }
+
     useEffect(()=>{
-        handelDealMethods()
-    },[])
+        
+        console.log(state);
+        if(!state.api){
+            return
+        }
+        getPrice();
+    },[state.account])
     return (
         <FundingStyle>
             <Modal title="Sign Up" open={isModalOpen} footer={null} onCancel={handleCancel} maskClosable={true}
@@ -99,14 +148,18 @@ const Funding = (props) => {
                             <div className="seconed-box1">
                                 <div className="box1-con">
                                     <span>Your Pay</span>
-                                    <span style={{ color: '#8A8080' }}>Balance: 3.23</span>
+                                    <span style={{ color: '#8A8080' }}>Balance: {BigNumber(balance).multipliedBy(10 ** 18) }</span>
                                 </div>
                                 <div className="box1-con">
                                     <Select
-                                        defaultValue="lucy"
+                                        defaultValue="0"
                                         style={{
                                             width: 180,
+                                            background:"rgb(28,28,28)",
+                                            color:"white",
+                                            fontSize:'20px',
                                         }}
+                                        options={payOptions}
                                         onChange={handleChange} />
                                     <div> <img src={usdt} style={{ width: '30px' }} /> <span>USDT</span></div>
                                 </div>
@@ -114,7 +167,7 @@ const Funding = (props) => {
                             <div className="seconed-box1">
                                 <div className="box1-con">
                                     <span style={{ color: '#8A8080' }}>Your Receive SBD</span>
-                                    <span style={{ color: '#8A8080' }}>Balance: 3.23</span>
+                                    <span style={{ color: '#8A8080' }}>Balance: { }</span>
                                 </div>
                                 <div className="box1-con">
                                     <span className="content-bold">20,000</span>
@@ -314,7 +367,7 @@ const Funding = (props) => {
                                 <div className="first-contain" >
                                     <span style={{ width: "auto" }}>Choose to Withdraw Tokens</span>
                                     <Select
-                                        defaultValue="lucy"
+                                        defaultValue="0"
                                         style={{
                                             width: 120,
                                         }}
