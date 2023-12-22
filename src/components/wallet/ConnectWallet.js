@@ -50,7 +50,7 @@ const ConnectWallet = () => {
         if (chainID !== allVersion.testChainID) {
             //添加链
             try {
-                // await window.ethereum.request({method:"wallet_getPermissions"})
+                await window.ethereum.request({method:"wallet_getPermissions"})
                 await window.ethereum.request({
                     method: "wallet_addEthereumChain",
                     params: [

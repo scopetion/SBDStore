@@ -71,7 +71,7 @@ const CreContext = React.createContext()
 
 const ConnectProvider = (props) => {
     const [state, dispatch] = useReducer(reducer, initState)
-
+    const {api} = state
     return <CreContext.Provider value={{ state, dispatch }}>
         {props.children}
     </CreContext.Provider>

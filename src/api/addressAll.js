@@ -8,6 +8,7 @@ import Swap from '../abi/swap.json'
 import NFTLock from '../abi/nftlock.json'
 import OgLock from '../abi/oglock.json'
 
+
 let CONTRACTS 
 if(true){
     CONTRACTS={
@@ -19,8 +20,9 @@ if(true){
         SRT:{address:'0x283cc14385BEfe07ff12D3Aaa1248F1Dfdf4DA35',abi:SRT},
         SVT:{address:'0x93d04c7311282114F79380F4624EBe3267bBd36A',abi:SVT},
         Swap:{address:'0x93d809098DD687162b81C9f13198e75af73D2E0f',abi:Swap},                                                                           
-        OgLock:{address:'',abi:OgLock}
-        
+        OgLock:{address:'',abi:OgLock},
+        USDT: {address: "0x19589F875420b7F0eC16c8D781cD9Ee1f86d8134", abi: erc20},
+
     }
 }
 

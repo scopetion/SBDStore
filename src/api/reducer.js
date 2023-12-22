@@ -2,7 +2,7 @@
 const reducer = (state,action)=>{
     switch(action.type){
         case "CONNECT" :
-            return {...state,apiState:"CONNECTING",abi:action.payload}
+            return {...state,apiState:"CONNECTING",api:action.payload}
         case "CONNECT_INIT" :
             return {...state,apiState:"CONNECT_INIT"}
         case "CONNECT_SUCCESS" :

@@ -4,68 +4,82 @@ import usdt from '../../imgs/usdt.png'
 import sbd from '../../imgs/SBD.png'
 import svt from '../../imgs/svt.png'
 import { CloseCircleOutlined } from '@ant-design/icons';
-import {useCreContext} from '../../api/connect'
-import { dealMethods,viewMethods } from "../../api/contractFun";
-import { getConContract,getContractName } from "../../api/contractDemo";
+import { useCreContext } from '../../api/connect'
+import { dealMethods, viewMethods } from "../../api/contractFun";
+import { getConContract, getContractName } from "../../api/contractDemo";
 import judgeStatus from "../../api/judgeStatus";
-import BigNumber from "bignumber.js"
+import BigNumber from "bignumber.js";
+import addressAll from '../../api/addressAll'
+import Max from '../../utils/constant'
+import { showNumber } from "../../utils/shown";
+import { getRecommender } from "../../graph/purChaseGQL";
 
-import FundingStyle from './style.js'
+import FundingStyle from './style.js';
 
 const Funding = (props) => {
-    let {state, dispatch} = useCreContext();
+    let { state, dispatch } = useCreContext();
     const [curnav, setCurnav] = useState(1)
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [price,setPrice] = useState()
-    const [balance,setBalance] = useState()
+    const [price, setPrice] = useState()
+    const [USDTBalance, setUSDTBalance] = useState()
+    const [SBDBalance, setSBDBalance] = useState()
+    const [SVTBalance, setSVTBalance] = useState()
+    const [accountState, setAccountState] = useState({})
 
-    const payOptions=[
+    const payOptions = [
         {
-          value: '200',
-          label: '200',
+            value: '200',
+            label: '200',
         },
         {
-          value: '500',
-          label: '500',
+            value: '500',
+            label: '500',
         },
         {
-          value: '1000',
-          label: '1000',
+            value: '1000',
+            label: '1000',
         },
         {
-          value: '2000',
-          label: '2000',
+            value: '2000',
+            label: '2000',
         },
         {
             value: '5000',
             label: '5000',
-          },
-          {
+        },
+        {
             value: '10000',
             label: '10000',
-          }
-      ]
+        }
+    ]
 
 
-    const handelDealMethods = async (name, params)=>{
-        let contractAdd = await getContractName('spbd',state.api)
-        await dealMethods(contractAdd,name,state.account,params)
+    const handelDealMethods = async (name, params) => {
+        let contractAdd = await getContractName('spbd', state.api)
+        await dealMethods(contractAdd, name, state.account, params)
     }
-    const handelViewMethods = async (name,params)=>{
-        let contractAdd = await getContractName("spbd",state.api)
-        await viewMethods(contractAdd,name,state.account,params)
+    const handelViewMethods = async (name, params) => {
+        let contractAdd = await getContractName("spbd", state.api)
+        await viewMethods(contractAdd, name, state.account, params)
     }
 
-    const onChange = (checked) => {
-        console.log(`switch to ${checked}`);
-    };
+    const handelAprove = async () => {
+        let contractAdd = await getConContract('erc20', addressAll['USDT'].address, state.api)
+        await dealMethods(contractAdd, state.account, "applove", [addressAll["spbd"].address, Max])
+    }
+    //通过创建usdt合约实例，调用erc20代币接口，拿到余额【coinName即每个代币的名字，name为合约名字】
+    const handelCoinMethods = async (name, coinName, params) => {
+        let usdtContractAdd = await getContractName(coinName, state.api)
+        await viewMethods(usdtContractAdd, name, state.account, params)
+    }
+   
     const handleChange = (value) => {
         console.log(`selected ${value}`);
     };
 
     const showModal = () => {
         setIsModalOpen(true);
-        
+
     };
     const handleOk = () => {
         setIsModalOpen(false);
@@ -77,23 +91,52 @@ const Funding = (props) => {
         console.log(current, pageSize);
     };
 
-    const getPrice =async () =>{
-        let salePrice = await handelViewMethods("salePrice",[])
-        setPrice(salePrice)
+    const getPrice = async () => {
+        let salePrice = await handelViewMethods("salePrice", [])
+        setPrice(BigNumber(salePrice).dividedBy(10 ** 18).toString())
     }
 
-    const getBalance =async ()=>{
-        let balanceOf = await handelViewMethods('getBalanceOfSbd',[])
-        setBalance(balanceOf)
+    const getCoinBalance = async () => {
+        let USDTBalanceOf = await handelCoinMethods('balanceOf', "USDT", [state.account])
+        setUSDTBalance(BigNumber(USDTBalanceOf).dividedBy(10 ** 18).toString())
+
+        let SBDBlanceOf = await handelCoinMethods("balanceOf", "SBD", [state.account])
+        setSBDBalance(BigNumber(SBDBlanceOf).dividedBy(10 ** 18).toString())
+
+        let SVTBlanceOf = await handelCoinMethods("balanceOf", "SVT", [state.account])
+        setSVTBalance(BigNumber(SVTBlanceOf).dividedBy(10 ** 18).toString())
     }
 
-    useEffect(()=>{
-        
-        if(!state.api){
+    const getState = async () => {
+        let basic = await handelViewMethods("isNotRegister", [state.account])
+        let supe = await handelViewMethods("getActivateAccount", [state.account])
+        setAccountState({ basic,supe  })
+    }
+
+    const getRecommen = async (address)=>{
+        let res = await getRecommender(address)
+        console.log(res);
+    }
+
+    const getReceive = async () => {
+        let res = await handelViewMethods("receiveSbd", [])
+    }
+    const getLockSBD = async () => {
+        let res = await handelViewMethods("", [])
+    }
+
+    useEffect(() => {
+        console.log(state);
+
+        if (!state.api) {
             return
         }
+        
+        getState()
         getPrice();
-    },[state.account])
+        getCoinBalance()
+        getRecommen(state.account)
+    }, [state.account])
     return (
         <FundingStyle>
             <Modal title="Sign Up" open={isModalOpen} footer={null} onCancel={handleCancel} maskClosable={true}
@@ -127,36 +170,36 @@ const Funding = (props) => {
                         <div className="box-first">
                             <div className="first-contain">
                                 <span>Basic Accounts</span>
-                                <Switch defaultChecked onChange={onChange} />;
+                                <Switch checked={accountState.basic} />;
                             </div>
                             <div className="first-contain">
                                 <span>Super Accounts</span>
-                                <Switch defaultChecked onChange={onChange} />;
+                                <Switch checked={accountState.supe} />;
                             </div>
                             <Button onClick={showModal}>Sign Up</Button>
                         </div>
 
                         <div className="box-first">
-                            
+
                             <div className="seconed-contain">
                                 <span className="contain-title">Price</span>
-                                <span> {price} </span>
+                                <span> {showNumber(price)} </span>
                             </div>
-                          
+
                             <hr />
                             <div className="seconed-box1">
                                 <div className="box1-con">
                                     <span>Your Pay</span>
-                                    <span style={{ color: '#8A8080' }}>Balance: {BigNumber(balance).multipliedBy(10 ** 18) }</span>
+                                    <span style={{ color: '#8A8080' }}>Balance: {showNumber(USDTBalance)}</span>
                                 </div>
                                 <div className="box1-con">
                                     <Select
                                         defaultValue="0"
                                         style={{
                                             width: 180,
-                                            background:"rgb(28,28,28)",
-                                            color:"white",
-                                            fontSize:'20px',
+                                            background: "rgb(28,28,28)",
+                                            color: "white",
+                                            fontSize: '20px',
                                         }}
                                         options={payOptions}
                                         onChange={handleChange} />
@@ -166,10 +209,10 @@ const Funding = (props) => {
                             <div className="seconed-box1">
                                 <div className="box1-con">
                                     <span style={{ color: '#8A8080' }}>Your Receive SBD</span>
-                                    <span style={{ color: '#8A8080' }}>Balance: { }</span>
+                                    <span style={{ color: '#8A8080' }}>Balance: {showNumber(SBDBalance)}</span>
                                 </div>
                                 <div className="box1-con">
-                                    <span className="content-bold">20,000</span>
+                                    <span className="content-bold">{ }</span>
                                     <div> <img src={sbd} style={{ width: '30px' }} /> <span>SBD</span></div>
                                 </div>
                                 <hr />
@@ -177,16 +220,16 @@ const Funding = (props) => {
                                     <span style={{ color: '#8A8080' }}>Your Lock SBD</span>
                                 </div>
                                 <div className="box1-con">
-                                    <span className="content-bold">20,000</span>
+                                    <span className="content-bold">{ }</span>
                                     <div> <img src={sbd} style={{ width: '30px' }} /> <span>SBD</span></div>
                                 </div>
                                 <hr />
                                 <div className="box1-con">
                                     <span style={{ color: '#8A8080' }}>Your Receive SVT</span>
-                                    <span style={{ color: '#8A8080' }}>Balance: 3.23</span>
+                                    <span style={{ color: '#8A8080' }}>Balance: {showNumber(SVTBalance)}</span>
                                 </div>
                                 <div className="box1-con">
-                                    <span className="content-bold">20,000</span>
+                                    <span className="content-bold">{ }</span>
                                     <div> <img src={svt} style={{ width: '30px' }} /> <span>SVT</span></div>
                                 </div>
                                 <hr />
@@ -194,7 +237,7 @@ const Funding = (props) => {
                                     <span style={{ color: '#8A8080' }}>Your Receive NFT(Available: 200)</span>
 
                                 </div>
-                                <span className="content-bold">20,000</span>
+                                <span className="content-bold">{ }</span>
                                 <Button>Swap</Button>
                             </div>
                         </div>
@@ -444,7 +487,7 @@ const Funding = (props) => {
                         </div>
                     </div>
                 }
-               
+
 
             </div>
         </FundingStyle>
