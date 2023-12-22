@@ -89,7 +89,6 @@ const Funding = (props) => {
 
     useEffect(()=>{
         
-        console.log(state);
         if(!state.api){
             return
         }
