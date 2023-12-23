@@ -14,6 +14,9 @@ export function showNumber(value,decimals) {
         return BigNumber(value.toString()).toFixed(0)
     }                
     
+    if(decimals<3 ){
+        return BigNumber(value)
+    }
     return 0
 
 }

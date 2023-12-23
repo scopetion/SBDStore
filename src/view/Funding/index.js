@@ -20,11 +20,13 @@ const Funding = (props) => {
     let { state, dispatch } = useCreContext();
     const [curnav, setCurnav] = useState(1)
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [price, setPrice] = useState()
+    const [price, setPrice] = useState(0.01)
     const [USDTBalance, setUSDTBalance] = useState()
     const [SBDBalance, setSBDBalance] = useState()
     const [SVTBalance, setSVTBalance] = useState()
     const [accountState, setAccountState] = useState({})
+    const [recommender, setRecommender] = useState()
+    const [registerId,setRegisterId] = useState()
 
     const payOptions = [
         {
@@ -53,7 +55,7 @@ const Funding = (props) => {
         }
     ]
 
-
+    const [form] = Form.useForm()
     const handelDealMethods = async (name, params) => {
         let contractAdd = await getContractName('spbd', state.api)
         await dealMethods(contractAdd, name, state.account, params)
@@ -72,7 +74,7 @@ const Funding = (props) => {
         let usdtContractAdd = await getContractName(coinName, state.api)
         await viewMethods(usdtContractAdd, name, state.account, params)
     }
-   
+
     const handleChange = (value) => {
         console.log(`selected ${value}`);
     };
@@ -81,8 +83,42 @@ const Funding = (props) => {
         setIsModalOpen(true);
 
     };
-    const handleOk = () => {
+
+    const gecommender =async (address)=>{
+        let res = await getRecommender(address)
+        console.log(res);
+        setRecommender(res)
+        if( res.data && res.data.allRegisters && res.data.allRegisters[0] ){
+            const resultCommend = res.data.allRegisters
+            setRecommender(resultCommend[recommender.length-1].recommenders)
+            setRegisterId(resultCommend[recommender.length-1].Contract_id)
+        }
+
+    
+    }                                                                   
+    const handleOk = async () => {
         setIsModalOpen(false);
+        try {
+
+            let signAdd = "";
+            //super  邀请码是通过子图【address】查出上级  有的话不需要在填写邀请码
+            if (accountState.supe && recommender) {
+                signAdd = state.account
+            }
+
+            else {
+                if (!form.getFieldValue().code) {
+                    return
+                }
+
+                signAdd = form.getFieldValue().code.toString()
+            }
+            await handelDealMethods("register", [signAdd.toString()])
+
+        }
+        catch (e) {
+            console.log(e);
+        }
     };
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -93,7 +129,7 @@ const Funding = (props) => {
 
     const getPrice = async () => {
         let salePrice = await handelViewMethods("salePrice", [])
-        setPrice(BigNumber(salePrice).dividedBy(10 ** 18).toString())
+        setPrice(BigNumber(salePrice).dividedBy(1000).toString())
     }
 
     const getCoinBalance = async () => {
@@ -110,13 +146,9 @@ const Funding = (props) => {
     const getState = async () => {
         let basic = await handelViewMethods("isNotRegister", [state.account])
         let supe = await handelViewMethods("getActivateAccount", [state.account])
-        setAccountState({ basic,supe  })
+        setAccountState({ basic, supe })
     }
 
-    const getRecommen = async (address)=>{
-        let res = await getRecommender(address)
-        console.log(res);
-    }
 
     const getReceive = async () => {
         let res = await handelViewMethods("receiveSbd", [])
@@ -131,17 +163,17 @@ const Funding = (props) => {
         if (!state.api) {
             return
         }
-        
+
         getState()
         getPrice();
         getCoinBalance()
-        getRecommen(state.account)
+        gecommender(state.account)
     }, [state.account])
     return (
         <FundingStyle>
             <Modal title="Sign Up" open={isModalOpen} footer={null} onCancel={handleCancel} maskClosable={true}
                 style={{ background: 'rgba(19, 19, 19, 1)' }} closeIcon={<CloseCircleOutlined />}>
-                <Form name="basic">
+                <Form name="basic" form={form} >
                     <Form.Item
                         label="Wallet Address "
                         name="address"
@@ -177,6 +209,9 @@ const Funding = (props) => {
                                 <Switch checked={accountState.supe} />;
                             </div>
                             <Button onClick={showModal}>Sign Up</Button>
+                            {accountState.basic &&
+                                <div>ID:{registerId}</div>
+                            }
                         </div>
 
                         <div className="box-first">

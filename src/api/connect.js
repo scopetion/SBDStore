@@ -2,7 +2,7 @@ import React, { useContext, useReducer } from 'react'
 import reducer from './reducer'
 import getWeb3 from './getWeb3'
 import { notification } from 'antd'
-import initState, { account, network } from './initState';
+import initState from './initState';
 
 const openNotification = (message) => {
     notification.open({
