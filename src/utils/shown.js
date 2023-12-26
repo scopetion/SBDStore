@@ -14,8 +14,11 @@ export function showNumber(value,decimals) {
         return BigNumber(value.toString()).toFixed(0)
     }                
     
-    if(decimals<3 ){
-        return BigNumber(value)
+    if (decimals < 3) {
+        return value ? BigNumber((BigNumber(value).toFixed(decimals,BigNumber.ROUND_CEIL))).toLocaleString() : 0
+    }
+    if (value) {
+        return value ? BigNumber((BigNumber(value).toFixed(decimals,BigNumber.ROUND_CEIL))).toString() : 0
     }
     return 0
 

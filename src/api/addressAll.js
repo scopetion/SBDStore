@@ -10,7 +10,7 @@ import OgLock from '../abi/oglock.json'
 
 
 let CONTRACTS 
-if(true){
+
     CONTRACTS={
         erc20:{address:'',abi:erc20},
         spbd:{address:'0x65d741A9d21cA93AB8aC202b7e6693AE3656CEFa',abi:spbd},
@@ -24,6 +24,6 @@ if(true){
         USDT: {address: "0x19589F875420b7F0eC16c8D781cD9Ee1f86d8134", abi: erc20},
 
     }
-}
+
 
 export default CONTRACTS

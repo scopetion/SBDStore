@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import BigNumber from 'bignumber'
 import { message, notification } from 'antd'
 
-async function dealMethods(contract, methodName, account, params) {
+async function dealMethods(contract, account, methodName,  params) {
     let wait = message.loading('Wait sign',0)
     try {
         await contract.methods[methodName](...params).estimateGas({
@@ -24,20 +24,22 @@ async function dealMethods(contract, methodName, account, params) {
                 return res;
             }).catch(e => {
                 console.log(e);
+                message.error(e.message);
             })
         }).catch((e)=>{
             setTimeout(wait, 1000);
             console.log(e);
-
+            message.error(e.message);
         })
         
     }
     catch (e) {
         console.log(e);
+        message.error(e.message);
     }
 }
 
-async function viewMethods(contract, methodName, account, params) {
+async function viewMethods(contract,account ,methodName,  params) {
     try {
         let res = await contract.methods[methodName](...params).call({
             from: account

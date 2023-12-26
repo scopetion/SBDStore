@@ -23,10 +23,14 @@ const Funding = (props) => {
     const [price, setPrice] = useState(0.01)
     const [USDTBalance, setUSDTBalance] = useState()
     const [SBDBalance, setSBDBalance] = useState()
+    const [sbdval, setSbdVal] = useState(0)
+    const [amount, setAmount] = useState(0)
+    const [receiveSBD, setReceiveSBD] = useState(0)
+    const [receiveSVT, setReceiveSVT] = useState(0)
     const [SVTBalance, setSVTBalance] = useState()
     const [accountState, setAccountState] = useState({})
     const [recommender, setRecommender] = useState()
-    const [registerId,setRegisterId] = useState()
+    const [registerId, setRegisterId] = useState()
 
     const payOptions = [
         {
@@ -58,11 +62,11 @@ const Funding = (props) => {
     const [form] = Form.useForm()
     const handelDealMethods = async (name, params) => {
         let contractAdd = await getContractName('spbd', state.api)
-        await dealMethods(contractAdd, name, state.account, params)
+        await dealMethods(contractAdd, state.account, name, params)
     }
     const handelViewMethods = async (name, params) => {
         let contractAdd = await getContractName("spbd", state.api)
-        await viewMethods(contractAdd, name, state.account, params)
+        return await viewMethods(contractAdd, state.account, name, params)
     }
 
     const handelAprove = async () => {
@@ -72,11 +76,26 @@ const Funding = (props) => {
     //通过创建usdt合约实例，调用erc20代币接口，拿到余额【coinName即每个代币的名字，name为合约名字】
     const handelCoinMethods = async (name, coinName, params) => {
         let usdtContractAdd = await getContractName(coinName, state.api)
-        await viewMethods(usdtContractAdd, name, state.account, params)
+        return await viewMethods(usdtContractAdd, state.account, name, params)
     }
 
-    const handleChange = (value) => {
-        console.log(`selected ${value}`);
+
+    const handleChange = async (value) => {
+
+        if (value >= 0) {
+            setAmount(value / price)
+            setSbdVal(value)
+            console.log(amount);
+        }
+        let res = await handelViewMethods("receiveSbd", [value])
+        let res1 = await handelViewMethods("receiveSvt", [value])
+        console.log(res);
+        setReceiveSBD(res)
+        setReceiveSVT(res1)
+    };
+    const handleChange1 = (value) => {
+
+        console.log(value);
     };
 
     const showModal = () => {
@@ -84,18 +103,18 @@ const Funding = (props) => {
 
     };
 
-    const gecommender =async (address)=>{
+    const gecommender = async (address) => {
         let res = await getRecommender(address)
         console.log(res);
         setRecommender(res)
-        if( res.data && res.data.allRegisters && res.data.allRegisters[0] ){
+        if (res.data && res.data.allRegisters && res.data.allRegisters[0]) {
             const resultCommend = res.data.allRegisters
-            setRecommender(resultCommend[recommender.length-1].recommenders)
-            setRegisterId(resultCommend[recommender.length-1].Contract_id)
+            setRecommender(resultCommend[recommender.length - 1].recommenders)
+            setRegisterId(resultCommend[recommender.length - 1].Contract_id)
         }
 
-    
-    }                                                                   
+
+    }
     const handleOk = async () => {
         setIsModalOpen(false);
         try {
@@ -128,8 +147,11 @@ const Funding = (props) => {
     };
 
     const getPrice = async () => {
-        let salePrice = await handelViewMethods("salePrice", [])
-        setPrice(BigNumber(salePrice).dividedBy(1000).toString())
+        let res = await handelViewMethods("salePrice", [])
+        console.log(res);
+        setPrice(BigNumber(res).dividedBy(1000).toString())
+
+        console.log(price);
     }
 
     const getCoinBalance = async () => {
@@ -149,13 +171,15 @@ const Funding = (props) => {
         setAccountState({ basic, supe })
     }
 
+    const receiveNft = async () => {
+        if (sbdval > 1000) {
 
-    const getReceive = async () => {
-        let res = await handelViewMethods("receiveSbd", [])
+        }
     }
-    const getLockSBD = async () => {
-        let res = await handelViewMethods("", [])
-    }
+
+    useEffect(() => {
+        receiveNft()
+    }, [sbdval])
 
     useEffect(() => {
         console.log(state);
@@ -163,7 +187,6 @@ const Funding = (props) => {
         if (!state.api) {
             return
         }
-
         getState()
         getPrice();
         getCoinBalance()
@@ -218,7 +241,7 @@ const Funding = (props) => {
 
                             <div className="seconed-contain">
                                 <span className="contain-title">Price</span>
-                                <span> {showNumber(price)} </span>
+                                <span> {price} </span>
                             </div>
 
                             <hr />
@@ -237,7 +260,8 @@ const Funding = (props) => {
                                             fontSize: '20px',
                                         }}
                                         options={payOptions}
-                                        onChange={handleChange} />
+                                        onChange={handleChange}
+                                        value={sbdval} />
                                     <div> <img src={usdt} style={{ width: '30px' }} /> <span>USDT</span></div>
                                 </div>
                             </div>
@@ -247,7 +271,7 @@ const Funding = (props) => {
                                     <span style={{ color: '#8A8080' }}>Balance: {showNumber(SBDBalance)}</span>
                                 </div>
                                 <div className="box1-con">
-                                    <span className="content-bold">{ }</span>
+                                    <span className="content-bold">{showNumber(BigNumber(receiveSBD).minus(receiveSVT))}</span>
                                     <div> <img src={sbd} style={{ width: '30px' }} /> <span>SBD</span></div>
                                 </div>
                                 <hr />
@@ -255,7 +279,7 @@ const Funding = (props) => {
                                     <span style={{ color: '#8A8080' }}>Your Lock SBD</span>
                                 </div>
                                 <div className="box1-con">
-                                    <span className="content-bold">{ }</span>
+                                    <span className="content-bold">{showNumber(receiveSVT)}</span>
                                     <div> <img src={sbd} style={{ width: '30px' }} /> <span>SBD</span></div>
                                 </div>
                                 <hr />
@@ -264,14 +288,20 @@ const Funding = (props) => {
                                     <span style={{ color: '#8A8080' }}>Balance: {showNumber(SVTBalance)}</span>
                                 </div>
                                 <div className="box1-con">
-                                    <span className="content-bold">{ }</span>
+                                    <span className="content-bold">{showNumber(receiveSVT)}</span>
                                     <div> <img src={svt} style={{ width: '30px' }} /> <span>SVT</span></div>
                                 </div>
                                 <hr />
-                                <div className="box1-con">
-                                    <span style={{ color: '#8A8080' }}>Your Receive NFT(Available: 200)</span>
+                                {(sbdval > 1000) ?
+                                    <div className="box1-con">
+                                        
+                                        {
+                                            (sbdval == 2000) ? <span style={{ color: '#8A8080' }}>Your Receive NFT Available: 888</span> && <img /> : ""
+                                        }
 
-                                </div>
+
+                                    </div> : ""
+                                }
                                 <span className="content-bold">{ }</span>
                                 <Button>Swap</Button>
                             </div>
@@ -448,7 +478,7 @@ const Funding = (props) => {
                                         style={{
                                             width: 120,
                                         }}
-                                        onChange={handleChange} />
+                                        onChange={handleChange1} />
                                 </div>
                                 <div className="first-contain">
                                     <span style={{ color: "rgba(138, 128, 128, 1)", width: "auto" }}>Your Lock Amount(s)</span>
@@ -525,7 +555,7 @@ const Funding = (props) => {
 
 
             </div>
-        </FundingStyle>
+        </FundingStyle >
     )
 }
 
