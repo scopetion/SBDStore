@@ -29,7 +29,7 @@ const Funding = (props) => {
     const [receiveSVT, setReceiveSVT] = useState(0)
     const [SVTBalance, setSVTBalance] = useState()
     const [accountState, setAccountState] = useState({})
-    const [recommender, setRecommender] = useState()
+    const [recommender, setRecommender] = useState([])
     const [registerId, setRegisterId] = useState()
 
     const payOptions = [
@@ -102,7 +102,7 @@ const Funding = (props) => {
         setIsModalOpen(true);
 
     };
-
+//获取子图 来判断是否有上级 邀请码
     const gecommender = async (address) => {
         let res = await getRecommender(address)
         console.log(res);
@@ -130,9 +130,9 @@ const Funding = (props) => {
                     return
                 }
 
-                signAdd = form.getFieldValue().code.toString()
+                signAdd = form.getFieldValue().code
             }
-            await handelDealMethods("register", [signAdd.toString()])
+            await handelDealMethods("register", [signAdd])
 
         }
         catch (e) {
@@ -167,7 +167,7 @@ const Funding = (props) => {
 
     const getState = async () => {
         let basic = await handelViewMethods("isNotRegister", [state.account])
-        let supe = await handelViewMethods("getActivateAccount", [state.account])
+        let supe = await handelViewMethods("checkAddrForSupAccount", [state.account])
         setAccountState({ basic, supe })
     }
 
@@ -199,16 +199,22 @@ const Funding = (props) => {
                 <Form name="basic" form={form} >
                     <Form.Item
                         label="Wallet Address "
-                        name="address"
+                        name="code"
                     >
                         {state.account}
                     </Form.Item>
-                    <Form.Item
+                    {(accountState.supe && recommender) && <div>
+                        {recommender}
+                    </div>}
+                    {!(accountState.supe && recommender ) &&
+                        <Form.Item
                         label="Invitation Code "
                         name="code"
                     >
                         <Input />
                     </Form.Item>
+                    }
+                    
                     <Button onClick={handleOk}>Submit</Button>
                 </Form>
             </Modal>
