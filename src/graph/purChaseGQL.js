@@ -1,12 +1,10 @@
 import {fetchQueryBase} from "./index";
-// test01
 
 
-let ogname = "patton-sr/ava7508"
-
-if (true) {
-    ogname = "patton-sr/cefa"
-}
+// test07
+// let ogname = "patton-sr/7eab"
+// test06
+let ogname = "patton-sr/cefa"
 export function getDonateRecord() {
     return fetchQueryBase(ogname, {
         text: `{

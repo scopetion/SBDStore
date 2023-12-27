@@ -34,15 +34,15 @@ const Funding = (props) => {
     const [accountState, setAccountState] = useState({})
     const [recommender, setRecommender] = useState([])
     const [registerId, setRegisterId] = useState()
-    const [nodeName,setNodeName] = useState()
+    const [nodeName, setNodeName] = useState(0)
 
     const [smallNode, setSmallNode] = useState()
     const [bigNode, setBigNode] = useState()
     const [superNode, setSuperNode] = useState()
-    const [smallAvaliable,setSmallAvaliable] = useState()
-    const [bigAvaliable,setBigAvaliable] = useState()
-    const [superAvaliable,setSuperAvaliable] = useState()
-    const [nodeMap,setNodeMap] = useState()
+    const [smallAvaliable, setSmallAvaliable] = useState()
+    const [bigAvaliable, setBigAvaliable] = useState()
+    const [superAvaliable, setSuperAvaliable] = useState()
+    const [nodeMap, setNodeMap] = useState()
 
 
     const payOptions = [
@@ -121,8 +121,11 @@ const Funding = (props) => {
         setRecommender(res)
         if (res.data && res.data.allRegisters && res.data.allRegisters[0]) {
             const resultCommend = res.data.allRegisters
-            setRecommender(resultCommend[recommender.length - 1].recommenders)
-            setRegisterId(resultCommend[recommender.length - 1].Contract_id)
+            resultCommend.map((i) => {
+                setRecommender(i.recommenders)
+                setRegisterId(i.Contract_id)
+            })
+
         }
     }
     const handleOk = async () => {
@@ -192,55 +195,51 @@ const Funding = (props) => {
 
         let contractSmallAdd = await getConContract('SmallLv1', smallNode, state.api)
         let smallInitAmount = await viewMethods(contractSmallAdd, smallNode, 'initAmount', [])
-        let smallTotalAmount = await viewMethods(contractSmallAdd,smallNode,'totalMint',[])
-        setSmallAvaliable(smallInitAmount-smallTotalAmount)
+        let smallTotalAmount = await viewMethods(contractSmallAdd, smallNode, 'totalMint', [])
+        setSmallAvaliable(smallInitAmount - smallTotalAmount)
 
         let contractBigAdd = await getConContract('BigLv1', bigNode, state.api)
         let bigInitAmount = await viewMethods(contractBigAdd, bigNode, 'initAmount', [])
-        let bigTotalAmount = await viewMethods(contractBigAdd,bigNode,'totalMint',[])
-        setBigAvaliable(bigInitAmount-bigTotalAmount)
+        let bigTotalAmount = await viewMethods(contractBigAdd, bigNode, 'totalMint', [])
+        setBigAvaliable(bigInitAmount - bigTotalAmount)
 
         let contractSuperAdd = await getConContract('SuperLv1', superNode, state.api)
         let superInitAmount = await viewMethods(contractSuperAdd, superNode, 'initAmount', [])
-        let superTotalAmount = await viewMethods(contractSuperAdd,superNode,'totalMint',[])
-        setSuperAvaliable(superInitAmount-superTotalAmount)
+        let superTotalAmount = await viewMethods(contractSuperAdd, superNode, 'totalMint', [])
+        setSuperAvaliable(superInitAmount - superTotalAmount)
 
     }
 
-    const getAmount = async ()=>{
-        
+    const getAmount = async () => {
+
         let num = sbdval
         console.log(num);
-        let nodeType = await handelViewMethods("nftType",[showNumber(sbdval)])
+        let nodeType = await handelViewMethods("nftType", [showNumber(sbdval)])
         console.log(nodeType);
-        if(smallNode && bigNode && superNode){
+        if (smallNode && bigNode && superNode) {
             let NodeArr = {
-                "smallnode":smallNode,
-                "bignode":bigNode,
-                "supernode":superNode,
+                "smallnode": smallNode,
+                "bignode": bigNode,
+                "supernode": superNode,
 
             }
             setNodeMap({
                 NodeArr
             })
-       
-if(smallNode == nodeType){
-    
-    setNodeName(NodeArr.smallnode)
-    console.log(nodeName)
 
-}
-else if(bigNode == nodeType){
-    setNodeName(NodeArr.bignode)
-}
-else if(superNode == nodeType){
-    setNodeName(NodeArr.supernode)
-}
-else{
-    setNodeName("")
-}
- }
-       
+            if (smallNode == nodeType) {
+                setNodeName(NodeArr.smallnode)
+                console.log(nodeName)
+            }
+            if (bigNode == nodeType) {
+                setNodeName(NodeArr.bignode)
+            }
+            if (superNode == nodeType) {
+                setNodeName(NodeArr.supernode)
+            }
+            
+        }
+
     }
 
     useEffect(() => {
@@ -254,6 +253,7 @@ else{
         if (!state.api) {
             return
         }
+        
         getState()
         getPrice();
         getCoinBalance()
@@ -365,25 +365,25 @@ else{
                                     <div> <img src={svt} style={{ width: '30px' }} /> <span>SVT</span></div>
                                 </div>
                                 <hr />
-                                {nodeName== smallNode ?
-                                    <div className="box1-con" style={{display:"block"}}>
-                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(smallAvaliable) }</span>
+                                {nodeName == smallNode ?
+                                    <div className="box1-con" style={{ display: "block" }}>
+                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(smallAvaliable)}</span>
                                         <br />
-                                        <img src={smallpic} style={{width:"100px",margin:"10px 34%"}}/>
+                                        <img src={smallpic} style={{ width: "100px", margin: "10px 34%" }} />
                                     </div> : ""
                                 }
-                                {nodeName== bigNode ?
-                                    <div className="box1-con" style={{display:"block"}}>
-                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(bigAvaliable) }</span>
+                                {nodeName == bigNode ?
+                                    <div className="box1-con" style={{ display: "block" }}>
+                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(bigAvaliable)}</span>
                                         <br />
-                                        <img src={bigpic} style={{width:"100px",margin:"10px 34%"}}/>
+                                        <img src={bigpic} style={{ width: "100px", margin: "10px 34%" }} />
                                     </div> : ""
                                 }
-                                {nodeName== superNode ?
-                                    <div className="box1-con" style={{display:"block"}}>
-                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(superAvaliable) }</span>
+                                {nodeName == superNode ?
+                                    <div className="box1-con" style={{ display: "block" }}>
+                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(superAvaliable)}</span>
                                         <br />
-                                        <img src={superpic} style={{width:"100px",margin:"10px 34%"}}/>
+                                        <img src={superpic} style={{ width: "100px", margin: "10px 34%" }} />
                                     </div> : ""
                                 }
                                 <span className="content-bold">{ }</span>

@@ -14,6 +14,8 @@ import SuperLv1 from '../abi/supNode.json'
 
 let CONTRACTS 
 
+
+
     CONTRACTS={
         erc20:{address:'',abi:erc20},
         spbd:{address:'0x65d741A9d21cA93AB8aC202b7e6693AE3656CEFa',abi:spbd},
@@ -25,9 +27,9 @@ let CONTRACTS
         Swap:{address:'0x93d809098DD687162b81C9f13198e75af73D2E0f',abi:Swap},                                                                           
         OgLock:{address:'',abi:OgLock},
         USDT: {address: "0x19589F875420b7F0eC16c8D781cD9Ee1f86d8134", abi: erc20},
-        SmallLv1: {address: "0xc3679f1f3aBedC165F54fAE413f611C436d1E0D6", abi: SmallLv1},
+        SmallLv1: {address: "0x3ffbD63Dcc8C96E3B4f040EF69c01c562D38aC10", abi: SmallLv1},
         BigLv1: {address: "0xEc86BA83251c709a30C2548BA5E4064b272cFF84", abi: BigLv1},
-        SuperLv1: {address: "0x3ffbD63Dcc8C96E3B4f040EF69c01c562D38aC10", abi: SuperLv1},
+        SuperLv1: {address: "0xc3679f1f3aBedC165F54fAE413f611C436d1E0D6", abi: SuperLv1},
     }
 
 
