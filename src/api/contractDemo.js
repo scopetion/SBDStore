@@ -12,13 +12,12 @@ function getContractName(name, web3) {
                 "",
         });
     }
-   return new web3.eth.Contract(CONTRACTS[name].abi, CONTRACTS[name].address, {});
+    return new web3.eth.Contract(CONTRACTS[name].abi, CONTRACTS[name].address, {});
 }
 
-function getConContract( name, address, web3) {
-    return new web3.eth.Contract(CONTRACTS[name].abi,address,{})
+function getConContract(name, address, web3) {
+    return new web3.eth.Contract(CONTRACTS[name].abi, address, {});
 }
-
 function getConAddress(name) {
     return CONTRACTS[name].address
 }

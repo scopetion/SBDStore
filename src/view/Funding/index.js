@@ -13,6 +13,9 @@ import addressAll from '../../api/addressAll'
 import Max from '../../utils/constant'
 import { showNumber } from "../../utils/shown";
 import { getRecommender } from "../../graph/purChaseGQL";
+import bigpic from '../../imgs/BigNode.png'
+import smallpic from '../../imgs/SmallNode.png'
+import superpic from '../../imgs/SuperNode.png'
 
 import FundingStyle from './style.js';
 
@@ -31,6 +34,16 @@ const Funding = (props) => {
     const [accountState, setAccountState] = useState({})
     const [recommender, setRecommender] = useState([])
     const [registerId, setRegisterId] = useState()
+    const [nodeName,setNodeName] = useState()
+
+    const [smallNode, setSmallNode] = useState()
+    const [bigNode, setBigNode] = useState()
+    const [superNode, setSuperNode] = useState()
+    const [smallAvaliable,setSmallAvaliable] = useState()
+    const [bigAvaliable,setBigAvaliable] = useState()
+    const [superAvaliable,setSuperAvaliable] = useState()
+    const [nodeMap,setNodeMap] = useState()
+
 
     const payOptions = [
         {
@@ -94,7 +107,6 @@ const Funding = (props) => {
         setReceiveSVT(res1)
     };
     const handleChange1 = (value) => {
-
         console.log(value);
     };
 
@@ -102,7 +114,7 @@ const Funding = (props) => {
         setIsModalOpen(true);
 
     };
-//获取子图 来判断是否有上级 邀请码
+    //获取子图 来判断是否有上级 邀请码
     const gecommender = async (address) => {
         let res = await getRecommender(address)
         console.log(res);
@@ -112,8 +124,6 @@ const Funding = (props) => {
             setRecommender(resultCommend[recommender.length - 1].recommenders)
             setRegisterId(resultCommend[recommender.length - 1].Contract_id)
         }
-
-
     }
     const handleOk = async () => {
         setIsModalOpen(false);
@@ -172,12 +182,69 @@ const Funding = (props) => {
     }
 
     const receiveNft = async () => {
-        if (sbdval > 1000) {
+        let res = await handelViewMethods("smallNode", [])
+        console.log(res);
+        setSmallNode(res)
+        let res1 = await handelViewMethods("bigNode", [])
+        setBigNode(res1)
+        let res2 = await handelViewMethods("supNode", [])
+        setSuperNode(res2)
 
-        }
+        let contractSmallAdd = await getConContract('SmallLv1', smallNode, state.api)
+        let smallInitAmount = await viewMethods(contractSmallAdd, smallNode, 'initAmount', [])
+        let smallTotalAmount = await viewMethods(contractSmallAdd,smallNode,'totalMint',[])
+        setSmallAvaliable(smallInitAmount-smallTotalAmount)
+
+        let contractBigAdd = await getConContract('BigLv1', bigNode, state.api)
+        let bigInitAmount = await viewMethods(contractBigAdd, bigNode, 'initAmount', [])
+        let bigTotalAmount = await viewMethods(contractBigAdd,bigNode,'totalMint',[])
+        setBigAvaliable(bigInitAmount-bigTotalAmount)
+
+        let contractSuperAdd = await getConContract('SuperLv1', superNode, state.api)
+        let superInitAmount = await viewMethods(contractSuperAdd, superNode, 'initAmount', [])
+        let superTotalAmount = await viewMethods(contractSuperAdd,superNode,'totalMint',[])
+        setSuperAvaliable(superInitAmount-superTotalAmount)
+
+    }
+
+    const getAmount = async ()=>{
+        
+        let num = sbdval
+        console.log(num);
+        let nodeType = await handelViewMethods("nftType",[showNumber(sbdval)])
+        console.log(nodeType);
+        if(smallNode && bigNode && superNode){
+            let NodeArr = {
+                "smallnode":smallNode,
+                "bignode":bigNode,
+                "supernode":superNode,
+
+            }
+            setNodeMap({
+                NodeArr
+            })
+       
+if(smallNode == nodeType){
+    
+    setNodeName(NodeArr.smallnode)
+    console.log(nodeName)
+
+}
+else if(bigNode == nodeType){
+    setNodeName(NodeArr.bignode)
+}
+else if(superNode == nodeType){
+    setNodeName(NodeArr.supernode)
+}
+else{
+    setNodeName("")
+}
+ }
+       
     }
 
     useEffect(() => {
+        getAmount()
         receiveNft()
     }, [sbdval])
 
@@ -206,15 +273,15 @@ const Funding = (props) => {
                     {(accountState.supe && recommender) && <div>
                         {recommender}
                     </div>}
-                    {!(accountState.supe && recommender ) &&
+                    {!(accountState.supe && recommender) &&
                         <Form.Item
-                        label="Invitation Code "
-                        name="code"
-                    >
-                        <Input />
-                    </Form.Item>
+                            label="Invitation Code "
+                            name="code"
+                        >
+                            <Input />
+                        </Form.Item>
                     }
-                    
+
                     <Button onClick={handleOk}>Submit</Button>
                 </Form>
             </Modal>
@@ -247,7 +314,7 @@ const Funding = (props) => {
 
                             <div className="seconed-contain">
                                 <span className="contain-title">Price</span>
-                                <span> {price} </span>
+                                <span>${price} </span>
                             </div>
 
                             <hr />
@@ -298,14 +365,25 @@ const Funding = (props) => {
                                     <div> <img src={svt} style={{ width: '30px' }} /> <span>SVT</span></div>
                                 </div>
                                 <hr />
-                                {(sbdval > 1000) ?
-                                    <div className="box1-con">
-                                        
-                                        {
-                                            (sbdval == 2000) ? <span style={{ color: '#8A8080' }}>Your Receive NFT Available: 888</span> && <img /> : ""
-                                        }
-
-
+                                {nodeName== smallNode ?
+                                    <div className="box1-con" style={{display:"block"}}>
+                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(smallAvaliable) }</span>
+                                        <br />
+                                        <img src={smallpic} style={{width:"100px",margin:"10px 34%"}}/>
+                                    </div> : ""
+                                }
+                                {nodeName== bigNode ?
+                                    <div className="box1-con" style={{display:"block"}}>
+                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(bigAvaliable) }</span>
+                                        <br />
+                                        <img src={bigpic} style={{width:"100px",margin:"10px 34%"}}/>
+                                    </div> : ""
+                                }
+                                {nodeName== superNode ?
+                                    <div className="box1-con" style={{display:"block"}}>
+                                        <span style={{ color: '#8A8080' }}>Your Receive NFT Available: {showNumber(superAvaliable) }</span>
+                                        <br />
+                                        <img src={superpic} style={{width:"100px",margin:"10px 34%"}}/>
                                     </div> : ""
                                 }
                                 <span className="content-bold">{ }</span>
@@ -558,8 +636,6 @@ const Funding = (props) => {
                         </div>
                     </div>
                 }
-
-
             </div>
         </FundingStyle >
     )

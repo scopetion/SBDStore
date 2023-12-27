@@ -9,7 +9,6 @@ import NFT from './view/NFT/index'
 import Swap from './view/Swap/index'
 import LockMining from './view/LockMining/index'
 import Bonus from './view/Bonus/index'
-
 import { GlobalStyle } from './pulic/pulblicStyle'
 import { AntdStyle } from './pulic/antdStyle'
 import HeadView from './components/head/HeadView';
@@ -23,7 +22,7 @@ function App() {
   return (
     <ConnectProvider>
 
-    <div className='home-container'>
+      <div className='home-container'>
         <GlobalStyle />
         <AntdStyle />
 
@@ -32,15 +31,14 @@ function App() {
             <Route path='/' element={<Login />}> </Route>
           </Routes>
           <div style={{ background: "linear-gradient(360deg,#1B1B1B 0%,#3E3E3E 100%)" }}>
-            <HeadView />
             {
-              location.pathname != './' &&
-
-              <div className="App" style={{ position: "relative", height: 'inherit', paddingTop: '0em' }}>
+              location.pathname != "/" && <div className="App" style={{ position: "relative", height: 'inherit', paddingTop: '0em' }}>
                 <div className="flex-container" style={{
                   width: "100%",
                   flexGrow: "1"
                 }}>
+                  <HeadView />
+
                   <Routes>
                     <Route path='/Funding' element={<Funding />}> </Route>
                     <Route path='/Token' element={<Token />}> </Route>
@@ -51,14 +49,13 @@ function App() {
                     <Route path='/Bonus' element={<Bonus />}> </Route>
                   </Routes>
                 </div>
+                <BottomView />
               </div>
-
             }
-            <BottomView />
           </div>
         </div>
-     </div>
-     </ConnectProvider>
+      </div>
+    </ConnectProvider>
 
   );
 }
