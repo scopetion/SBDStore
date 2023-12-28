@@ -44,6 +44,7 @@ const Funding = (props) => {
     const [superAvaliable, setSuperAvaliable] = useState()
     const [nodeMap, setNodeMap] = useState()
 
+    const [income, setIncome] = useState(0)
 
     const payOptions = [
         {
@@ -143,9 +144,9 @@ const Funding = (props) => {
                     return
                 }
 
-                signAdd = form.getFieldValue().code
+                signAdd = form.getFieldValue().code.toString()
             }
-            await handelDealMethods("register", [signAdd])
+            await handelDealMethods("register", [signAdd.toString()])
 
         }
         catch (e) {
@@ -237,8 +238,13 @@ const Funding = (props) => {
             if (superNode == nodeType) {
                 setNodeName(NodeArr.supernode)
             }
-            
+
         }
+
+    }
+
+    const getTotalIncome = async () => {
+
 
     }
 
@@ -253,7 +259,7 @@ const Funding = (props) => {
         if (!state.api) {
             return
         }
-        
+        getTotalIncome()
         getState()
         getPrice();
         getCoinBalance()
@@ -270,9 +276,14 @@ const Funding = (props) => {
                     >
                         {state.account}
                     </Form.Item>
-                    {(accountState.supe && recommender) && <div>
-                        {recommender}
-                    </div>}
+                    {(accountState.supe && recommender) && <Form.Item
+                        label="Invitation Code "
+                        name="code"
+                    >{recommender}
+
+                    </Form.Item>
+                        
+                    }
                     {!(accountState.supe && recommender) &&
                         <Form.Item
                             label="Invitation Code "
@@ -298,11 +309,11 @@ const Funding = (props) => {
                         <div className="box-first">
                             <div className="first-contain">
                                 <span>Basic Accounts</span>
-                                <Switch checked={accountState.basic} />;
+                                <Switch checked={accountState.basic} />
                             </div>
                             <div className="first-contain">
                                 <span>Super Accounts</span>
-                                <Switch checked={accountState.supe} />;
+                                <Switch checked={accountState.supe} />
                             </div>
                             <Button onClick={showModal}>Sign Up</Button>
                             {accountState.basic &&
