@@ -5,7 +5,7 @@ import {fetchQueryUrl} from "./index";
 
 let ogname = "https://api.thegraph.com/subgraphs/name/wysten-hgg/superbitdaov2"
 
-if(true){
+if (true) {
     ogname = "https://api.studio.thegraph.com/query/38059/superbitdaotest/v0.0.3"
 }
 export function getSwapRecords(addr) {

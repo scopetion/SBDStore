@@ -7,9 +7,7 @@ let big = "patton-sr/bignode1"
 let sup = "patton-sr/supnode1"
 
 
-if (true) {
-    small = "patton-sr/bignode"
-}
+
 
 export function getSmallNftMintRecord() {
     return fetchQueryBase(small, {

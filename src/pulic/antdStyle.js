@@ -68,6 +68,7 @@ height: 40px;
     border:1px solid rgba(255,255,2555,0.1);
     border-radius:10px;
 }
+
 @media screen and (max-width: 1920px){
     .ant-btn{
         font-size: 18px;

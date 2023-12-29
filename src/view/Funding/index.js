@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button, Switch, Select, Modal, Form, Input, Pagination } from "antd";
+import { Button, Switch, Select, Modal, Form, Input, Pagination, Empty } from "antd";
 import usdt from '../../imgs/usdt.png'
 import sbd from '../../imgs/SBD.png'
 import svt from '../../imgs/svt.png'
@@ -12,7 +12,7 @@ import BigNumber from "bignumber.js";
 import addressAll from '../../api/addressAll'
 import Max from '../../utils/constant'
 import { showNumber } from "../../utils/shown";
-import { getRecommender } from "../../graph/purChaseGQL";
+import { getRecommender, getAllRegisters, getAllAdminRate, getDonateRecord } from "../../graph/purChaseGQL";
 import bigpic from '../../imgs/BigNode.png'
 import smallpic from '../../imgs/SmallNode.png'
 import superpic from '../../imgs/SuperNode.png'
@@ -25,6 +25,7 @@ const Funding = (props) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [price, setPrice] = useState(0.01)
     const [USDTBalance, setUSDTBalance] = useState()
+    const [USDTTotal, setUSDTTotal] = useState()
     const [SBDBalance, setSBDBalance] = useState()
     const [sbdval, setSbdVal] = useState(0)
     const [amount, setAmount] = useState(0)
@@ -35,6 +36,10 @@ const Funding = (props) => {
     const [recommender, setRecommender] = useState([])
     const [registerId, setRegisterId] = useState()
     const [nodeName, setNodeName] = useState(0)
+
+    const [admin, setAdmin] = useState()
+    const [teamList, setTeamlist] = useState([])
+    const [teamlv, setTeamlv] = useState()
 
     const [smallNode, setSmallNode] = useState()
     const [bigNode, setBigNode] = useState()
@@ -83,9 +88,11 @@ const Funding = (props) => {
         return await viewMethods(contractAdd, state.account, name, params)
     }
 
-    const handelAprove = async () => {
+    const handelTotal = async () => {
         let contractAdd = await getConContract('erc20', addressAll['USDT'].address, state.api)
-        await dealMethods(contractAdd, state.account, "applove", [addressAll["spbd"].address, Max])
+        let res = await viewMethods(contractAdd, state.account, "balanceOf", [addressAll["spbd"].address])
+        console.log(res);
+        setUSDTTotal(BigNumber(res).dividedBy(10 ** 18).toString())
     }
     //通过创建usdt合约实例，调用erc20代币接口，拿到余额【coinName即每个代币的名字，name为合约名字】
     const handelCoinMethods = async (name, coinName, params) => {
@@ -143,7 +150,6 @@ const Funding = (props) => {
                 if (!form.getFieldValue().code) {
                     return
                 }
-
                 signAdd = form.getFieldValue().code.toString()
             }
             await handelDealMethods("register", [signAdd.toString()])
@@ -178,6 +184,7 @@ const Funding = (props) => {
         let SVTBlanceOf = await handelCoinMethods("balanceOf", "SVT", [state.account])
         setSVTBalance(BigNumber(SVTBlanceOf).dividedBy(10 ** 18).toString())
     }
+
 
     const getState = async () => {
         let basic = await handelViewMethods("isNotRegister", [state.account])
@@ -243,23 +250,47 @@ const Funding = (props) => {
 
     }
 
-    const getTotalIncome = async () => {
+    const getTeamList = async () => {
+        let res = await getAllRegisters(state.account)
+        let teamAdd = res.data.allRegisters
+        // let teamUserAdd =[]
+        teamAdd.map(async (i) => {
 
+        })
+
+        // console.log(teamAdd);
+        setTeamlist(res.data.allRegisters)
+        let teamLvList = await getAllAdminRate()
+        let teamArr = teamLvList.data.allteams
+
+        teamArr.map(async (i) => {
+            let rewords = await getDonateRecord()
+            console.log(rewords);
+            let teamRewards = rewords.data.allRecords
+            teamRewards.map((i)=>{
+                (BigNumber(i.usdtAmount).dividedBy(10 ** 18).toString());
+            })
+            // console.log(teamArr);
+            // setTeamlv(teamLvList.data.allteams)        
+        })
 
     }
 
+
     useEffect(() => {
+        handelTotal()
         getAmount()
         receiveNft()
     }, [sbdval])
 
     useEffect(() => {
         console.log(state);
-
+        judgeStatus()
         if (!state.api) {
             return
         }
-        getTotalIncome()
+
+        getTeamList()
         getState()
         getPrice();
         getCoinBalance()
@@ -282,7 +313,7 @@ const Funding = (props) => {
                     >{recommender}
 
                     </Form.Item>
-                        
+
                     }
                     {!(accountState.supe && recommender) &&
                         <Form.Item
@@ -301,7 +332,7 @@ const Funding = (props) => {
                     <span className={"nav-item" + (curnav == 1 ? " active" : '')} onClick={() => { setCurnav(1) }}>Funding</span>
                     <span className={"nav-item" + (curnav == 2 ? " active" : '')} onClick={() => { setCurnav(2) }}>Team</span>
                     <span className={"nav-item" + (curnav == 3 ? " active" : '')} onClick={() => { setCurnav(3) }}>Withdraw</span>
-                    {/* <span className={"nav-item" + (curnav == 4 ? " active" : '')} onClick={() => { setCurnav(4) }}>Admin</span> */}
+                    <span className={"nav-item" + (curnav == 4 ? " active" : '')} onClick={() => { setCurnav(4) }}>Lv{ }Admin</span>
 
                 </div>
                 {
@@ -415,7 +446,7 @@ const Funding = (props) => {
                             <div className="income-box">
                                 <p>USDT Total Income</p>
                                 <div>
-                                    <img src={usdt} style={{ width: '30px' }} /> <span>{ } USDT</span>
+                                    <img src={usdt} style={{ width: '30px' }} /> <span>{showNumber(USDTTotal)} USDT</span>
                                 </div>
                             </div>
                             <div className="super-form">
@@ -436,25 +467,28 @@ const Funding = (props) => {
                                         USDT Rewards
                                     </div>
                                 </div>
-                                {
-                                    <div className="super-list">
-                                        <div className="col lv">
-                                            15515555
-                                        </div>
-                                        <div className="col no">
-                                            15515555
-                                        </div>
-                                        <div className="col id">
-                                            15515555
-                                        </div>
-                                        <div className="col address">
-                                            0x21641….B60d
-                                        </div>
-                                        <div className="col rewards">
-                                            <img src={usdt} style={{ width: "30px" }} />0.003
-                                        </div>
-                                    </div>
+                                {teamList.length == 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /> :
+                                    teamList.map((i, index) => (
+                                        <div className="super-list">
+                                            <div className="col lv">
 
+                                            </div>
+                                            <div className="col no">
+                                                {index + 1}
+                                            </div>
+                                            <div className="col id">
+                                                {i.Contract_id}
+
+                                            </div>
+                                            <div className="col address">
+                                                {i._user.substr(0, 5) + '...' + i._user.substr(i._user.substr.length - 5, i._user.substr.length)}
+                                            </div>
+                                            <div className="col rewards">
+                                                <img src={usdt} style={{ width: "30px" }} />
+                                                {/* {BigNumber(i.dividedBy(10 ** 18).toString)} */}
+                                            </div>
+                                        </div>
+                                    ))
                                 }
                                 <Pagination className="page"
                                     showSizeChanger
@@ -513,37 +547,37 @@ const Funding = (props) => {
                                     {
                                         <div className="super-list funding-list">
                                             <div className="col no">
-                                                15515555
+
                                             </div>
                                             <div className="col lv">
-                                                15515555
+
                                             </div>
                                             <div className="col percent">
-                                                15515555
+
                                             </div>
                                             <div className="col id">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col address">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col price">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col cost">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col  rece-sbd">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col lock-sbd">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col rece-svt">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col rece-nft">
-                                                0x21641….B60d
+
                                             </div>
                                             <div className="col time">
 
@@ -646,6 +680,182 @@ const Funding = (props) => {
                             </div>
                         </div>
                     </div>
+                }
+                {curnav == 4 && setAdmin && <div>
+
+                    <div className="box-container">
+                        <Select
+                            style={{
+                                width: 220,
+
+                                background: "rgb(28,28,28)",
+                                color: "white",
+                                fontSize: '20px',
+                            }}
+                            options={[
+                                {
+                                    value: 'Team Rewards',
+                                    label: 'Team Rewards'
+                                },
+                                {
+                                    value: 'Set Super Accounts',
+                                    label: 'Set Super Accounts'
+                                }
+                            ]}
+                        />
+                        <div className="box-title">
+                            Team Rewards
+                        </div>
+                        <div className="income-box">
+                            <p>USDT Total Income</p>
+                            <div>
+                                <img src={usdt} style={{ width: '30px' }} /> <span>{showNumber(USDTTotal)} USDT</span>
+                            </div>
+                        </div>
+                        <div className="super-form">
+                            <div className="super-line">
+                                <div className="col">
+                                    Lv
+                                </div>
+                                <div className="col">
+                                    No.
+                                </div>
+                                <div className="col">
+                                    ID
+                                </div>
+                                <div className="col">
+                                    Address
+                                </div>
+                                <div className="col">
+                                    USDT Rewards
+                                </div>
+                            </div>
+                            {
+                                <div className="super-list">
+                                    <div className="col lv">
+                                        15515555
+                                    </div>
+                                    <div className="col no">
+                                        15515555
+                                    </div>
+                                    <div className="col id">
+                                        15515555
+                                    </div>
+                                    <div className="col address">
+                                        0x21641….B60d
+                                    </div>
+                                    <div className="col rewards">
+                                        <img src={usdt} style={{ width: "30px" }} />0.003
+                                    </div>
+                                </div>
+
+                            }
+                            <Pagination className="page"
+                                showSizeChanger
+                                onShowSizeChange={onShowSizeChange}
+                                defaultCurrent={3}
+                                total={500}
+                            />
+
+                        </div>
+                    </div>
+                    <div className="box-container">
+                        <div className="box-title">
+                            Team Funding List
+                        </div>
+
+                        <div className="super-form funding-form">
+                            <div className="super-overall funding-overall">
+                                <div className="super-line funding-line">
+                                    <div className="col">
+                                        No.
+                                    </div>
+                                    <div className="col">
+                                        Lv
+                                    </div>
+                                    <div className="col">
+                                        Percentage
+                                    </div>
+                                    <div className="col">
+                                        ID
+                                    </div>
+                                    <div className="col">
+                                        Address
+                                    </div>
+                                    <div className="col">
+                                        Price
+                                    </div>
+                                    <div className="col">
+                                        Cost
+                                    </div>
+                                    <div className="col">
+                                        Receive SBD
+                                    </div>
+                                    <div className="col">
+                                        Lock SBD
+                                    </div>
+                                    <div className="col">
+                                        Receive SVT
+                                    </div>
+                                    <div className="col">
+                                        Receive NFT
+                                    </div>
+                                    <div className="col">
+                                        Time(UTC)
+                                    </div>
+                                </div>
+                                {
+                                    <div className="super-list funding-list">
+                                        <div className="col no">
+                                            15515555
+                                        </div>
+                                        <div className="col lv">
+                                            15515555
+                                        </div>
+                                        <div className="col percent">
+                                            15515555
+                                        </div>
+                                        <div className="col id">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col address">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col price">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col cost">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col  rece-sbd">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col lock-sbd">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col rece-svt">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col rece-nft">
+                                            0x21641….B60d
+                                        </div>
+                                        <div className="col time">
+
+                                        </div>
+                                    </div>
+
+                                }
+                                <Pagination className="page"
+                                    showSizeChanger
+                                    onShowSizeChange={onShowSizeChange}
+                                    defaultCurrent={3}
+                                    total={500}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 }
             </div>
         </FundingStyle >

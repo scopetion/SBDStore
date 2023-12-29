@@ -1,11 +1,10 @@
 import {fetchQueryBase} from "./index";
 
 // test05 new
-
 let ogname = "patton-sr/oglockmainbsc"
 
-if(true){
-    ogname = "patton-sr/lock1"
+if (true) {
+    ogname = "patton-sr/ba5f"
 }
 export function getWithdrawRecords() {
     return fetchQueryBase(ogname, {

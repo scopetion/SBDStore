@@ -31,12 +31,7 @@ export function getAllAdminRate() {
               admin1
               admin2
               admin3
-              admin4
-              admin5
-              admin6
-              admin7
-              admin8
-              admin9
+           
               addr
               blockTimestamp
             }
@@ -44,12 +39,7 @@ export function getAllAdminRate() {
                    rate1
                      rate2
                      rate3
-                     rate4
-                     rate5
-                     rate6
-                     rate7
-                     rate8
-                     rate9
+                    
                      addr
                      blockTimestamp
               }

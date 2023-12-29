@@ -3,7 +3,7 @@ import { fetchQueryBase } from "./index";
 let pathname = "patton-sr/mainogbsc"
 
 if (true) {
-    pathname = "patton-sr/31bb"
+    pathname = "patton-sr/nftlocktest"
 }
 export function getMiningRecord(account) {
 
@@ -14,7 +14,7 @@ export function getMiningRecord(account) {
                 user
                 nft
                 tokenId
-                amount
+                power
                 blockTimestamp
              }
         }`
@@ -22,6 +22,21 @@ export function getMiningRecord(account) {
 }
 
 
+export function getUnMiningRecord(account) {
+ 
+    return fetchQueryBase(pathname, {
+        text: `{
+            unLockRecords(where:{user_contains:"${account}" } ){
+                id
+                user
+                nft
+                tokenId
+                power
+                blockTimestamp
+             }
+        }`
+    }, "")
+}
 export function getWithdrawSrtRecord(pageSize, page,account) {
 
     return fetchQueryBase(pathname, {

@@ -68,7 +68,7 @@ margin-bottom: 1em;
 
         .super-list{
             display: flex;
-            padding:2.5em 2em;
+            padding:1.5em 2em;
             &:nth-child(odd){
                 background: rgba(28, 28, 28, 1);
             }

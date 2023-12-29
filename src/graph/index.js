@@ -1,7 +1,7 @@
 /* eslint-disable */
 import $ from 'jquery'
 import {message} from "antd";
-import allV from '../api/allVersion';
+import develop from "../api/allVersion"
 
 function upload() {
 
@@ -23,7 +23,7 @@ const fetchQueryUrl = (path, params, variables) => {
     return response
 }
 const fetchQueryBase = (path, params, variables) => {
-    const subgraphUrl = allV.graphUrlBase
+    const subgraphUrl = develop.graphUrlBase
     const body = JSON.stringify({
         query: params.text, // GraphQL text from input
     })
@@ -36,7 +36,7 @@ const fetchQueryBase = (path, params, variables) => {
 }
 const fetchQuery = (path, params, variables) => {
     //juicebox
-    const subgraphUrl = allV.graphUrl
+    const subgraphUrl = develop.graphUrl
     const body = JSON.stringify({
         query: params.text, // GraphQL text from input
     })
